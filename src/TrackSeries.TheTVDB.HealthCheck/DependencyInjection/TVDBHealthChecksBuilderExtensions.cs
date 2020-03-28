@@ -23,6 +23,16 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.AddTVDBClient(clientSetup);
             }
 
+            if(options.CheckSeries && options.SerieId < 1)
+            {
+                throw new InvalidOperationException("SerieId must be greater than 0 when CheckSeries is enabled.");
+            }
+
+            if(options.CheckSearch && string.IsNullOrEmpty(options.SearchTerm))
+            {
+                throw new InvalidOperationException("SearchTerm must not be null or empty when CheckSearch is enabled.");
+            }
+
             return builder.Add(new HealthCheckRegistration(
                 name ?? TVDB_NAME,
                 sp => new TVDBHealthCheck(sp.GetRequiredService<ITVDBClient>(), options),
