@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -65,9 +66,66 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
             // Arrange
             var services = new ServiceCollection();
 
-            // Act && Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => services.AddHealthChecks().AddTVDB());
-            Assert.Equal("TVDBClient must be configured before calling AddTVDB or using TVDBHealthCheckOptions.ConfigureClient.", exception.Message);
+            // Act
+            Action action = () => services.AddHealthChecks().AddTVDB();
+
+            // Assert
+            action.Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage("TVDBClient must be configured before calling AddTVDB or using TVDBHealthCheckOptions.ConfigureClient.");
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        [InlineData(int.MinValue)]
+        public void AddCheckShouldThrowWhenCheckSeriesIsEnabledWithInvalidSerieId(int serieId)
+        {
+            // Arrange
+            var services = new ServiceCollection();
+
+            // Act
+            Action action = () => services.AddHealthChecks()
+            .AddTVDB(options =>
+            {
+                options.CheckSeries = true;
+                options.SerieId = serieId;
+                options.ConfigureClient(client =>
+                {
+                    client.ApiKey = APIKEY;
+                });
+            });
+
+            // Assert
+            action.Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage("SerieId must be greater than 0 when CheckSeries is enabled.");
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void AddCheckShouldThrowWhenCheckSearchIsEnabledWithInvalidSearchTerm(string searchTerm)
+        {
+            // Arrange
+            var services = new ServiceCollection();
+
+            // Act
+            Action action = () => services.AddHealthChecks()
+            .AddTVDB(options =>
+            {
+                options.CheckSearch = true;
+                options.SearchTerm = searchTerm;
+                options.ConfigureClient(client =>
+                {
+                    client.ApiKey = APIKEY;
+                });
+            });
+
+            // Assert
+            action.Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage("SearchTerm must not be null or empty when CheckSearch is enabled.");
         }
     }
 }
