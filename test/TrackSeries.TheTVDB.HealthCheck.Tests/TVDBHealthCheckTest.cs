@@ -105,13 +105,61 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
             result.Status.Should().Be(healthStatus);
         }
 
+        [Fact]
+        public async Task EnabledChecksShouldBeCalledWithConfiguredValues()
+        {
+            // Arrange
+            var clientMock = new Mock<ITVDBClient>();
+            var searchMock = new Mock<ISearchClient>();
+            var seriesMock = new Mock<ISeriesClient>();
+            var updatesMock = new Mock<IUpdatesClient>();
+            var languagesMock = new Mock<ILanguagesClient>();
+
+            clientMock.Setup(client => client.Search).Returns(searchMock.Object);
+            clientMock.Setup(client => client.Series).Returns(seriesMock.Object);
+            clientMock.Setup(client => client.Updates).Returns(updatesMock.Object);
+            clientMock.Setup(client => client.Languages).Returns(languagesMock.Object);
+
+            var serieId = 111111;
+            var searchTerm = "friends";
+
+            var services = new ServiceCollection()
+            .AddSingleton(clientMock.Object)
+            .AddHealthChecks()
+            .AddTVDB(options =>
+            {
+                options.CheckLanguages = true;
+                options.CheckSearch = true;
+                options.CheckUpdates = true;
+                options.CheckSeries = true;
+                options.SearchTerm = searchTerm;
+                options.SerieId = serieId;
+            })
+            .Services
+            .BuildServiceProvider();
+
+            var registration = Assert.Single(services.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value.Registrations);
+            var check = Assert.IsType<TVDBHealthCheck>(registration.Factory(services));
+
+            // Act
+            var result = await check.CheckHealthAsync(new HealthCheckContext() { Registration = registration });
+
+            // Assert
+            result.Status.Should().Be(HealthStatus.Healthy);
+            searchMock.Verify(search => search.SearchSeriesByNameAsync(searchTerm, default));
+            seriesMock.Verify(series => series.GetAsync(serieId, default));
+            languagesMock.Verify(languages => languages.GetAllAsync(default));
+            updatesMock.Verify(updates => updates.GetAsync(It.IsAny<DateTime>(), default));
+        }
+
         private static IServiceProvider GetServices(ITVDBClient client, Action<TVDBHealthCheckOptions> setup = null, HealthStatus? failureStatus = default)
         {
             return new ServiceCollection()
             .AddSingleton(client)
             .AddHealthChecks()
             .AddTVDB(setup, failureStatus: failureStatus)
-            .Services.BuildServiceProvider();
+            .Services
+            .BuildServiceProvider();
         }
 
         private static ITVDBClient GetFaultedClient()
