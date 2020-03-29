@@ -13,6 +13,7 @@
     <RepositoryUrl>https://github.com/TrackSeries/TrackSeries.TheTVDB.HealthCheck</RepositoryUrl>
 
     <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
