@@ -4,12 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>TrackSeries.TheTVDB.HealthCheck</AssemblyName>
     <AssemblyTitle>TrackSeries.TheTVDB.HealthCheck</AssemblyTitle>
-    <PackageId>TrackSeries.TheTVDB.HealthCheck</PackageId>
     <Description>AspNetCore Health Check for TheTVDB API V3</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Authors>Carlos J. Aliaga</Authors>
-    <Company>TrackSeries</Company>
-    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
