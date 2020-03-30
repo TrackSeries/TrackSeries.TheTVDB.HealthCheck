@@ -6,11 +6,12 @@
     <AssemblyTitle>TrackSeries.TheTVDB.HealthCheck</AssemblyTitle>
     <Description>AspNetCore Health Check for TheTVDB API V3</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>TheTVDB;AspNetCoreHealthChecks</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="3.1.3" />
-    <PackageReference Include="TrackSeries.TheTVDB.Client" Version="0.1.4" />
+    <PackageReference Include="TrackSeries.TheTVDB.Client" Version="1.0.3" />
   </ItemGroup>
 
 </Project>
