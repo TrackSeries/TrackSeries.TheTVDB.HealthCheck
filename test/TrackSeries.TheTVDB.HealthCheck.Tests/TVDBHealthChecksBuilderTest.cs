@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using TrackSeries.TheTVDB.HealthCheck.Properties;
 using Xunit;
 
 namespace TrackSeries.TheTVDB.HealthCheck.Tests
@@ -61,21 +62,6 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
             Assert.IsType<TVDBHealthCheck>(registration.Factory(serviceProvider));
         }
 
-        [Fact]
-        public void AddCheckShouldThrowWhenTVDBClientIsNotConfigured()
-        {
-            // Arrange
-            var services = GetServices();
-
-            // Act
-            Action action = () => services.AddHealthChecks().AddTVDB();
-
-            // Assert
-            action.Should()
-                .Throw<InvalidOperationException>()
-                .WithMessage("TVDBClient must be configured before calling AddTVDB or using TVDBHealthCheckOptions.ConfigureClient.");
-        }
-
         [Theory]
         [InlineData(-1)]
         [InlineData(0)]
@@ -100,7 +86,7 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
             // Assert
             action.Should()
                 .Throw<InvalidOperationException>()
-                .WithMessage("SerieId must be greater than 0 when CheckSeries is enabled.");
+                .WithMessage(Resources.InvalidSerieId);
         }
 
         [Theory]
@@ -126,7 +112,7 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
             // Assert
             action.Should()
                 .Throw<InvalidOperationException>()
-                .WithMessage("SearchTerm must not be null or empty when CheckSearch is enabled.");
+                .WithMessage(Resources.InvalidSearchTerm);
         }
 
         private IServiceCollection GetServices()
