@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,7 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
         public void AddCheckShouldRegisterWhenTVDBClientIsPreviouslyConfigured()
         {
             // Arrange
-            var services = new ServiceCollection();
+            var services = GetServices();
 
             services.AddTVDBClient(options =>
             {
@@ -39,7 +40,7 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
         public void AddCheckShouldRegisterWhenTVDBClientIsConfiguredOnAddTVDB()
         {
             // Arrange
-            var services = new ServiceCollection();
+            var services = GetServices();
 
             services.AddHealthChecks()
                 .AddTVDB(options =>
@@ -64,7 +65,7 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
         public void AddCheckShouldThrowWhenTVDBClientIsNotConfigured()
         {
             // Arrange
-            var services = new ServiceCollection();
+            var services = GetServices();
 
             // Act
             Action action = () => services.AddHealthChecks().AddTVDB();
@@ -82,7 +83,7 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
         public void AddCheckShouldThrowWhenCheckSeriesIsEnabledWithInvalidSerieId(int serieId)
         {
             // Arrange
-            var services = new ServiceCollection();
+            var services = GetServices();
 
             // Act
             Action action = () => services.AddHealthChecks()
@@ -108,7 +109,7 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
         public void AddCheckShouldThrowWhenCheckSearchIsEnabledWithInvalidSearchTerm(string searchTerm)
         {
             // Arrange
-            var services = new ServiceCollection();
+            var services = GetServices();
 
             // Act
             Action action = () => services.AddHealthChecks()
@@ -126,6 +127,14 @@ namespace TrackSeries.TheTVDB.HealthCheck.Tests
             action.Should()
                 .Throw<InvalidOperationException>()
                 .WithMessage("SearchTerm must not be null or empty when CheckSearch is enabled.");
+        }
+
+        private IServiceCollection GetServices()
+        {
+            var services = new ServiceCollection();
+            var configuration = new ConfigurationBuilder().Build();
+            services.AddSingleton<IConfiguration>(configuration);
+            return services;
         }
     }
 }
