@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using TrackSeries.TheTVDB.Client;
 using TrackSeries.TheTVDB.HealthCheck;
+using TrackSeries.TheTVDB.HealthCheck.Properties;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -19,18 +20,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if(!builder.Services.Any(s => s.ServiceType == typeof(ITVDBClient)))
             {
-                var clientSetup = options.ConfigueClientSetup ?? throw new InvalidOperationException("TVDBClient must be configured before calling AddTVDB or using TVDBHealthCheckOptions.ConfigureClient.");
-                builder.Services.AddTVDBClient(clientSetup);
+                builder.Services.AddTVDBClient(options.ConfigueClientSetup);
             }
 
             if(options.CheckSeries && options.SerieId < 1)
             {
-                throw new InvalidOperationException("SerieId must be greater than 0 when CheckSeries is enabled.");
+                throw new InvalidOperationException(Resources.InvalidSerieId);
             }
 
             if(options.CheckSearch && string.IsNullOrEmpty(options.SearchTerm))
             {
-                throw new InvalidOperationException("SearchTerm must not be null or empty when CheckSearch is enabled.");
+                throw new InvalidOperationException(Resources.InvalidSearchTerm);
             }
 
             return builder.Add(new HealthCheckRegistration(

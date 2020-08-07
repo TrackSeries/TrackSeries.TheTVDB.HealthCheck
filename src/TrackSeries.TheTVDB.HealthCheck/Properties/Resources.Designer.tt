@@ -1,0 +1,5 @@
+<#
+    Session["ResourceFile"] = "Resources.resx";
+    Session["LoggingDefinitionsClass"] = "LoggingDefinitions";
+#>
+<#@ include file="ResourcesGenerator.tt" #>
